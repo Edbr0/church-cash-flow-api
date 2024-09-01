@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  user_id           Int       @id @default(autoincrement())
+  name              String
+  email             String
+  user              String
+  password          String
+  access_profile_id Int
+  status            String
+  created_at        DateTime  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  created_user      String
+  updated_user      String?
+}
+
+model access_profile {
+  access_profile_id           Int       @id @default(autoincrement())
+  label              String
+  status            String
+  created_at        DateTime  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  created_user      String
+  updated_user      String?
+ 
+  access_profile_module access_profile_module[] @relation(map: "fk_access_profile")
+}
+
+
+model app_modules {
+  module_id           Int       @id @default(autoincrement())
+  name              String
+  description              String
+  status            String
+  created_at        DateTime  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  created_user      String
+  updated_user      String?
+
+  access_profile_module access_profile_module[] @relation(map: "fk_module_id")
+}
+
+
+model access_profile_module {
+  sequence_id           Int       @id @default(autoincrement())
+  access_profile_id           Int 
+  module_id           Int 
+  created_at        DateTime  @default(now()) @db.Timestamp(6)
+  created_user      String
+  
+  access_profile      access_profile   @relation(fields: [access_profile_id], references: [access_profile_id], onDelete: Cascade, map: "fk_access_profile")
+  app_modules         app_modules      @relation(fields: [module_id], references: [module_id], onDelete: Cascade, map: "fk_module_id")
+}
