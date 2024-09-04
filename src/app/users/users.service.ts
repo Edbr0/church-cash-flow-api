@@ -1,11 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersRepository } from './users.repository';
+import { InternalServerError } from 'src/shared/app-response/app.internal.sever.error';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(readonly usersRepository: UsersRepository) {}
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = { ...createUserDto, created_at: new Date(Date.now()), status: 'A' };
+
+      return await this.usersRepository.createUser(user);
+    } catch (error) {
+      InternalServerError(error);
+    }
   }
 
   findAll() {
