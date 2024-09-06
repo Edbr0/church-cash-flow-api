@@ -9,6 +9,10 @@ export class UsersService {
   constructor(readonly usersRepository: UsersRepository) {}
   async create(createUserDto: CreateUserDto) {
     try {
+      const exists = await this.usersRepository.countByProp('user', createUserDto.user);
+
+      if (exists > 0) throw new HttpException('Este nome de usuário já está em uso', HttpStatus.BAD_REQUEST);
+
       const user = { ...createUserDto, created_at: new Date(Date.now()), status: 'A' };
 
       return await this.usersRepository.createUser(user);
@@ -17,16 +21,29 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    try {
+      return await this.usersRepository.findAll();
+    } catch (error) {
+      InternalServerError(error);
+    }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(user_id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const exists = await this.usersRepository.countByProp('user', updateUserDto.user);
+
+      if (exists > 0) throw new HttpException('Este nome de usuário já está em uso', HttpStatus.BAD_REQUEST);
+
+      const user = { ...updateUserDto, updated_at: new Date(Date.now()) };
+      await this.usersRepository.updateUser(user_id, user);
+    } catch (error) {
+      InternalServerError(error);
+    }
   }
 
   remove(id: number) {
