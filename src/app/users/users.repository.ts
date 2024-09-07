@@ -57,4 +57,12 @@ export class UsersRepository {
       },
     });
   }
+
+  async findOneByUser(user: string): Promise<User> {
+    return await this.prisma.users.findFirst({
+      where: {
+        user: user,
+      },
+    });
+  }
 }

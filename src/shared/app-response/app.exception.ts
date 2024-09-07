@@ -14,7 +14,7 @@ function getErrorData(error) {
   };
 }
 
-export function InternalServerError(error) {
+export function Exception(error, statusCode = null) {
   const errorData = getErrorData(error);
-  throw new HttpException(errorData, errorData.statusCode);
+  throw new HttpException(errorData, statusCode ?? errorData.statusCode);
 }
