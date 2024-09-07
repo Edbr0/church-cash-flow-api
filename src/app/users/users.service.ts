@@ -35,9 +35,10 @@ export class UsersService {
 
   async update(user_id: number, updateUserDto: UpdateUserDto) {
     try {
-      const exists = await this.usersRepository.countByProp('user', updateUserDto.user);
+      const _user = await this.usersRepository.findByProp('user', updateUserDto.user);
 
-      if (exists > 0) throw new HttpException('Este nome de usuário já está em uso', HttpStatus.BAD_REQUEST);
+      if ((_user[0]?.user_id ?? user_id) != user_id)
+        throw new HttpException('Este nome de usuário já está em uso', HttpStatus.BAD_REQUEST);
 
       const user = { ...updateUserDto, updated_at: new Date(Date.now()) };
       await this.usersRepository.updateUser(user_id, user);
